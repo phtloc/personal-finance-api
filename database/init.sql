@@ -33,6 +33,3 @@ CREATE TABLE transactions (
 CREATE INDEX idx_users_email ON users(email);
 CREATE INDEX idx_transactions_user_date ON transactions(user_id, transaction_date);
 CREATE INDEX idx_categories_user_system ON categories(user_id, is_system);
-
-INSERT INTO users (email, password_hash, role, full_name) 
-VALUES ('admin@finance.com', '$2a$10$YourExampleHashHere', 'admin', 'System Administrator');

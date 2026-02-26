@@ -1,0 +1,65 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Personal Finance API",
+    "version": "1.0.0",
+    "description": "Tài liệu API cho dự án Quản lý tài chính cá nhân"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:5000",
+      "description": "Development Server"
+    }
+  ],
+  "paths": {
+    "/api/auth/register": {
+      "post": {
+        "summary": "Đăng ký tài khoản",
+        "tags": ["Auth"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": { "type": "string", "example": "test@gmail.com" },
+                  "password": { "type": "string", "example": "123456" },
+                  "fullName": { "type": "string", "example": "Nguyen Van A" }
+                }
+              }
+            }
+          }
+        }
+      },
+      "responses": {
+        "201": { "description": "Đăng ký thành công" },
+        "400": { "description": "Lỗi dữ liệu" }
+      }
+    },
+    "/api/auth/login": {
+      "post": {
+        "summary": "Đăng nhập hệ thống",
+        "tags": ["Auth"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": { "type": "string", "example": "admin@finance.com" },
+                  "password": { "type": "string", "example": "admin123" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Đăng nhập thành công, trả về Token" },
+          "401": { "description": "Sai thông tin đăng nhập" }
+        }
+      }
+    }
+  }
+}
