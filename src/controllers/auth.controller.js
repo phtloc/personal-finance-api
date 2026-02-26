@@ -1,5 +1,4 @@
 const authService = require('../services/auth.service');
-const db = require('../config/db');
 
 const register = async (req, res) => {
     try {
@@ -44,14 +43,11 @@ const login = async (req, res) => {
 const getProfile = async (req, res) => {
     try {
         const userId = req.user.id; 
-        console.log(userId);
+        
+        // Gọi Service thay vì tự gọi Database
+        const userProfile = await authService.getUserProfile(userId);
 
-        const userResult = await db.query(
-            'SELECT id, email, full_name, role, is_active, created_at FROM users WHERE id = $1', 
-            [userId]
-        );
-
-        res.status(200).json({ data: userResult.rows[0] });
+        res.status(200).json({ data: userProfile });
     } catch (error) {
         res.status(500).json({ message: 'Lỗi server', error: error.message });
     }

@@ -1,11 +1,11 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const db = require('../config/db');
+const userModel = require('../models/user.model');
 
 const registerUser = async (email, password, fullName) => {
     // 1. Kiểm tra email đã tồn tại chưa
-    const userExist = await db.query('SELECT * FROM users WHERE email = $1', [email]);
-    if (userExist.rows.length > 0) {
+    const userExist = await userModel.findByEmail(email);
+    if (userExist) {
         throw new Error('Email này đã được sử dụng!');
     }
 
@@ -14,31 +14,26 @@ const registerUser = async (email, password, fullName) => {
     const passwordHash = await bcrypt.hash(password, salt);
 
     // 3. Lưu vào Database
-    const newUser = await db.query(
-        'INSERT INTO users (email, password_hash, full_name, role) VALUES ($1, $2, $3, $4) RETURNING id, email, full_name, role',
-        [email, passwordHash, fullName, 'user'] // Mặc định là 'user'
-    );
+    const newUser = await userModel.create(email, passwordHash, fullName);
 
     return newUser.rows[0];
 };
 
 const loginUser = async (email, password) => {
-    const userResult = await db.query('SELECT * FROM users WHERE email = $1', [email]);
-    if (userResult.rowCount === 0) {
+    // Tìm user qua Model
+    const user = await userModel.findByEmail(email);
+    if (!user) {
         throw new Error('Email hoặc mật khẩu không chính xác!');
     }
-    const user = userResult.rows[0];
 
+    // Kiểm tra mật khẩu
     const isMatch = await bcrypt.compare(password, user.password_hash);
     if (!isMatch) {
         throw new Error('Email hoặc mật khẩu không chính xác!');
     }
 
-    const payload = {
-        id: user.id,
-        role: user.role
-    };
-
+    // Tạo Token
+    const payload = { id: user.id, role: user.role };
     const token = jwt.sign(payload, process.env.JWT_SECRET, { 
         expiresIn: process.env.JWT_EXPIRES_IN 
     });
@@ -54,4 +49,12 @@ const loginUser = async (email, password) => {
     };
 };
 
-module.exports = { registerUser, loginUser };
+const getUserProfile = async (userId) => {
+    const user = await userModel.findById(userId);
+    if (!user) {
+        throw new Error('Không tìm thấy người dùng!');
+    }
+    return user;
+};
+
+module.exports = { registerUser, loginUser, getUserProfile };
