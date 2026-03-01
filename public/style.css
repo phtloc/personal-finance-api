@@ -1,0 +1,86 @@
+/* ================= CSS CƠ BẢN ================= */
+:root {
+    --primary-color: #4CAF50;
+    --sidebar-bg: #2c3e50;
+    --sidebar-text: #ecf0f1;
+    --header-bg: #ffffff;
+    --bg-color: #f4f7f6;
+    --text-color: #333;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* ================= MÀN HÌNH ĐĂNG NHẬP ================= */
+#login-screen {
+    display: flex; justify-content: center; align-items: center; width: 100%; height: 100%;
+}
+.login-box {
+    background: white; padding: 30px; border-radius: 12px; 
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 350px; text-align: center;
+}
+.login-box input { width: 90%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 4px; }
+.login-box button { width: 100%; padding: 10px; background: var(--primary-color); color: white; border: none; border-radius: 4px; cursor: pointer; }
+#errorMsg { color: red; font-size: 14px; display: none; margin-bottom: 10px; }
+
+/* ================= BỐ CỤC DASHBOARD ================= */
+#app-screen { display: none; width: 100%; height: 100%; flex-direction: row; }
+
+/* SIDEBAR */
+.sidebar { width: 250px; background-color: var(--sidebar-bg); color: var(--sidebar-text); display: flex; flex-direction: column; }
+.sidebar-logo { padding: 20px; font-size: 20px; font-weight: bold; text-align: center; border-bottom: 1px solid #34495e; }
+.sidebar-menu { list-style: none; padding: 0; margin: 0; flex-grow: 1; }
+.sidebar-menu li { padding: 15px 20px; cursor: pointer; border-bottom: 1px solid #34495e; transition: 0.2s; }
+.sidebar-menu li:hover, .sidebar-menu li.active { background-color: var(--primary-color); }
+
+/* MAIN CONTENT */
+.main-wrapper { flex-grow: 1; display: flex; flex-direction: column; overflow-y: auto; }
+.header { background-color: var(--header-bg); padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+.header button { background-color: #e74c3c; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; }
+.content { flex-grow: 1; padding: 30px; }
+
+/* CARD & TABLE */
+.stats-grid { display: flex; gap: 20px; }
+.stat-card { background: white; padding: 20px; border-radius: 8px; flex: 1; box-shadow: 0 2px 5px rgba(0,0,0,0.05); border-left: 5px solid var(--primary-color); }
+.stat-card.expense { border-left-color: #e74c3c; }
+.stat-card.balance { border-left-color: #3498db; }
+
+table { width: 100%; border-collapse: collapse; margin-top: 20px; background: white; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+th { background-color: #f8f9fa; }
+
+.footer { text-align: center; padding: 15px; background-color: white; color: #7f8c8d; font-size: 14px; border-top: 1px solid #eee; }
+.view-section { display: none; }
+.view-section.active { display: block; }
+
+/* ================= FORM & BUTTON CRUD ================= */
+.crud-form {
+    background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    margin-bottom: 20px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
+}
+.form-input {
+    padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; outline: none;
+}
+.btn-primary {
+    padding: 10px 20px; background-color: var(--primary-color); color: white;
+    border: none; border-radius: 4px; cursor: pointer; transition: 0.2s;
+}
+.btn-primary:hover { background-color: #45a049; }
+.btn-danger {
+    padding: 6px 12px; background-color: #e74c3c; color: white;
+    border: none; border-radius: 4px; cursor: pointer; font-size: 12px;
+}
+.btn-danger:hover { background-color: #c0392b; }
+
+/* ================= CHART CONTAINER ================= */
+.chart-container {
+    background: white; margin-top: 30px; padding: 20px; border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05); text-align: center;
+}

@@ -24,4 +24,24 @@ const create = async (email, passwordHash, fullName, role = 'user') => {
     return result.rows[0];
 };
 
-module.exports = { findByEmail, findById, create };
+const findByIdWithPassword = async (id) => {
+    const result = await db.query('SELECT * FROM users WHERE id = $1', [id]);
+    return result.rows[0];
+};
+
+const updateFullName = async (id, fullName) => {
+    const result = await db.query(
+        'UPDATE users SET full_name = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2 RETURNING id, email, full_name, role',
+        [fullName, id]
+    );
+    return result.rows[0];
+};
+
+const updatePassword = async (id, passwordHash) => {
+    await db.query(
+        'UPDATE users SET password_hash = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2',
+        [passwordHash, id]
+    );
+};
+
+module.exports = { findByEmail, findById, create, findByIdWithPassword, updateFullName, updatePassword };

@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personal Finance Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+</head>
+
+<body>
+
+    <div id="login-screen">
+        <div class="login-box">
+            <h2>💰 Quản Lý Tài Chính</h2>
+            <p id="errorMsg"></p>
+            <input type="email" id="email" placeholder="Email (VD: demo@finance.com)">
+            <input type="password" id="password" placeholder="Mật khẩu">
+            <button onclick="handleLogin()">Đăng Nhập</button>
+        </div>
+    </div>
+
+    <div id="app-screen" style="display: none;">
+
+        <aside class="sidebar">
+            <div class="sidebar-logo">💼 Finance App</div>
+            <ul class="sidebar-menu">
+                <li class="active" onclick="switchView('dashboard')">📊 Tổng Quan</li>
+                <li onclick="switchView('categories')">📁 Danh Mục</li>
+                <li onclick="switchView('transactions')">💳 Giao Dịch</li>
+                <li onclick="switchView('wallets')">💳 Quản lý Ví</li>
+            </ul>
+        </aside>
+
+        <div class="main-wrapper">
+            <header class="header">
+                <h3 style="margin: 0;">Trang Quản Trị</h3>
+                <div>
+                    <span id="welcomeText" style="margin-right: 15px; font-weight: bold;">Chào, User</span>
+                    <button onclick="handleLogout()">Đăng Xuất</button>
+                </div>
+            </header>
+
+            <main class="content">
+                <div id="view-dashboard" class="view-section active">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h2 style="margin: 0;">Thống kê tổng quan</h2>
+                        <select id="timeRange" onchange="fetchDashboard()" class="form-input" style="width: 200px;">
+                            <option value="this_month">Tháng này</option>
+                            <option value="last_month">Tháng trước</option>
+                            <option value="this_year">Năm nay</option>
+                        </select>
+                    </div>
+
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <p style="margin:0; color:#7f8c8d;">Tổng Thu</p>
+                            <h2 style="margin:5px 0 0 0; color:#2ecc71;" id="lbl-income">0 đ</h2>
+                        </div>
+                        <div class="stat-card expense">
+                            <p style="margin:0; color:#7f8c8d;">Tổng Chi</p>
+                            <h2 style="margin:5px 0 0 0; color:#e74c3c;" id="lbl-expense">0 đ</h2>
+                        </div>
+                        <div class="stat-card balance">
+                            <p style="margin:0; color:#7f8c8d;">Số Dư</p>
+                            <h2 style="margin:5px 0 0 0; color:#3498db;" id="lbl-balance">0 đ</h2>
+                        </div>
+                    </div>
+
+                    <div class="chart-container">
+                        <h3>Biểu đồ tỷ lệ Thu / Chi</h3>
+                        <div id="d3-chart"></div>
+                    </div>
+                </div>
+
+                <div id="view-categories" class="view-section">
+                    <h2>Quản lý Danh Mục</h2>
+                    <form id="form-category" class="crud-form" onsubmit="createCategory(event)">
+                        <select id="cat-icon" class="form-input" style="width: auto;">
+                            <optgroup label="Chi tiêu">
+                                <option value="🍔">🍔 Ăn uống</option>
+                                <option value="☕">☕ Cà phê</option>
+                                <option value="🛒">🛒 Siêu thị</option>
+                                <option value="🚗">🚗 Đi lại</option>
+                                <option value="💡">💡 Điện nước</option>
+                                <option value="💊">💊 Sức khỏe</option>
+                                <option value="🎬">🎬 Giải trí</option>
+                            </optgroup>
+                            <optgroup label="Thu nhập">
+                                <option value="💰">💰 Tiền lương</option>
+                                <option value="📈">📈 Đầu tư</option>
+                                <option value="🎁">🎁 Được tặng</option>
+                            </optgroup>
+                            <optgroup label="Khác">
+                                <option value="📦">📦 Khác</option>
+                            </optgroup>
+                        </select>
+                        <input type="text" id="cat-name" placeholder="Tên danh mục" class="form-input" required>
+                        <select id="cat-type" class="form-input">
+                            <option value="EXPENSE">Chi tiêu (EXPENSE)</option>
+                            <option value="INCOME">Thu nhập (INCOME)</option>
+                        </select>
+                        <button type="submit" class="btn-primary">Thêm Mới</button>
+                    </form>
+
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Icon</th>
+                                <th>Tên danh mục</th>
+                                <th>Loại</th>
+                                <th>Hành động</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-categories"></tbody>
+                    </table>
+                </div>
+
+                <div id="view-transactions" class="view-section">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h2 style="margin: 0;">Lịch sử Giao Dịch</h2>
+
+                        <div
+                            style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; align-items: center; background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+                            <label style="font-weight: bold; color: #555; margin: 0;">Bộ lọc:</label>
+
+                            <input type="month" id="filter-month" class="form-input" onchange="fetchTransactions()">
+
+                            <select id="filter-wallet" class="form-input" onchange="fetchTransactions()">
+                                <option value="">-- Tất cả ví --</option>
+                            </select>
+
+                            <select id="filter-category" class="form-input" onchange="fetchTransactions()">
+                                <option value="">-- Tất cả danh mục --</option>
+                            </select>
+
+                            <button type="button"
+                                style="padding: 8px 15px; background: #95a5a6; color: white; border: none; border-radius: 4px; cursor:pointer;"
+                                onclick="clearFilter()">❌ Bỏ lọc</button>
+                            <button type="button"
+                                style="padding: 8px 15px; background: var(--primary-color); color: white; border: none; border-radius: 4px; cursor:pointer; margin-left: auto;"
+                                onclick="fetchTransactions()">🔄 Tải lại dữ liệu</button>
+                        </div>
+                    </div>
+
+                    <form id="form-transaction" class="crud-form" onsubmit="createTransaction(event)">
+                        <select id="trans-wallet" class="form-input" required>
+                            <option value="">-- Chọn ví --</option>
+                        </select>
+                        <select id="trans-category" class="form-input" required>
+                            <option value="">-- Chọn danh mục --</option>
+                        </select>
+                        <input type="number" id="trans-amount" placeholder="Số tiền" class="form-input" required>
+                        <input type="date" id="trans-date" class="form-input" required>
+                        <input type="text" id="trans-notes" placeholder="Ghi chú" class="form-input">
+                        <button type="submit" class="btn-primary">Lưu Giao Dịch</button>
+                    </form>
+
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Ngày</th>
+                                <th>Ví</th>
+                                <th>Danh mục</th>
+                                <th>Số tiền</th>
+                                <th>Ghi chú</th>
+                                <th>Hành động</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-transactions"></tbody>
+                    </table>
+                </div>
+                <div id="view-wallets" class="view-section">
+                    <h2>Quản lý Ví tiền</h2>
+
+                    <form id="form-wallet" class="crud-form" onsubmit="createWallet(event)">
+                        <select id="wallet-icon" class="form-input" style="width: auto;">
+                            <option value="💵">💵 Tiền mặt</option>
+                            <option value="💳">💳 Thẻ ngân hàng</option>
+                            <option value="🏦">🏦 Sổ tiết kiệm</option>
+                            <option value="📱">📱 Ví điện tử</option>
+                        </select>
+                        <input type="text" id="wallet-name" placeholder="Tên ví (VD: Momo, VCB)" class="form-input"
+                            required>
+                        <input type="number" id="wallet-balance" placeholder="Số dư ban đầu" class="form-input"
+                            required>
+                        <button type="submit" class="btn-primary">Thêm Ví Mới</button>
+                    </form>
+
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Icon</th>
+                                <th>Tên ví</th>
+                                <th>Số dư hiện tại</th>
+                                <th>Hành động</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-wallets">
+                        </tbody>
+                    </table>
+                </div>
+            </main>
+
+            <footer class="footer">
+                &copy; 2026 Personal Finance API.
+            </footer>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>

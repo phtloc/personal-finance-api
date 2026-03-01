@@ -31,12 +31,32 @@ const login = async (req, res) => {
         // Gọi logic từ service
         const result = await authService.loginUser(email, password);
 
+        res.cookie('token', result.token, {
+            httpOnly: true, 
+            secure: process.env.NODE_ENV === 'production', 
+            sameSite: 'strict',
+            maxAge: 24 * 60 * 60 * 1000
+        });
+
         res.status(200).json({
             message: 'Đăng nhập thành công!',
-            data: result
+            data: result.user 
         });
     } catch (error) {
         res.status(401).json({ message: error.message });
+    }
+};
+
+const logout = async (req, res) => {
+    try {
+        res.clearCookie('token', {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict'
+        });
+        res.status(200).json({ message: 'Đăng xuất thành công!' });
+    } catch (error) {
+        res.status(500).json({ message: 'Lỗi khi đăng xuất' });
     }
 };
 
@@ -53,4 +73,28 @@ const getProfile = async (req, res) => {
     }
 };
 
-module.exports = { register, login, getProfile };
+const updateProfile = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const { fullName } = req.body;
+        
+        const updatedUser = await authService.updateProfile(userId, fullName);
+        res.status(200).json({ message: 'Cập nhật thông tin thành công!', data: updatedUser });
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+};
+
+const changePassword = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const { oldPassword, newPassword } = req.body;
+        
+        await authService.changePassword(userId, oldPassword, newPassword);
+        res.status(200).json({ message: 'Đổi mật khẩu thành công!' });
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+};
+
+module.exports = { register, login, logout, getProfile, updateProfile, changePassword };

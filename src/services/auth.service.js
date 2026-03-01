@@ -57,4 +57,31 @@ const getUserProfile = async (userId) => {
     return user;
 };
 
-module.exports = { registerUser, loginUser, getUserProfile };
+const updateProfile = async (userId, fullName) => {
+    if (!fullName) throw new Error('Vui lòng nhập họ tên mới!');
+    return await userModel.updateFullName(userId, fullName);
+};
+
+const changePassword = async (userId, oldPassword, newPassword) => {
+    if (!oldPassword || !newPassword) {
+        throw new Error('Vui lòng nhập đầy đủ mật khẩu cũ và mới!');
+    }
+
+    // 1. Lấy thông tin user hiện tại
+    const user = await userModel.findByIdWithPassword(userId);
+
+    // 2. Kiểm tra mật khẩu cũ có khớp không
+    const isMatch = await bcrypt.compare(oldPassword, user.password_hash);
+    if (!isMatch) {
+        throw new Error('Mật khẩu cũ không chính xác!');
+    }
+
+    // 3. Băm (hash) mật khẩu mới
+    const salt = await bcrypt.genSalt(10);
+    const newPasswordHash = await bcrypt.hash(newPassword, salt);
+
+    // 4. Lưu vào Database
+    await userModel.updatePassword(userId, newPasswordHash);
+};
+
+module.exports = { registerUser, loginUser, getUserProfile, updateProfile, changePassword };

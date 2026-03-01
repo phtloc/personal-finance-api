@@ -60,6 +60,221 @@
           "401": { "description": "Sai thông tin đăng nhập" }
         }
       }
+    },
+    "/api/auth/logout": {
+      "post": {
+        "summary": "Đăng xuất hệ thống",
+        "tags": ["Auth"],
+        "responses": {
+          "200": { "description": "Đăng xuất thành công" }
+        }
+      }
+    },
+    "/api/auth/profile": {
+      "get": {
+        "summary": "Xem thông tin cá nhân",
+        "tags": ["Auth"],
+        "responses": {
+          "200": { "description": "Lấy thông tin thành công" },
+          "401": { "description": "Chưa đăng nhập" }
+        }
+      },
+      "put": {
+        "summary": "Cập nhật họ tên",
+        "tags": ["Auth"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "fullName": { "type": "string", "example": "Nguyễn Văn B" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Cập nhật thành công" }
+        }
+      }
+    },
+    "/api/auth/change-password": {
+      "put": {
+        "summary": "Đổi mật khẩu",
+        "tags": ["Auth"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "oldPassword": { "type": "string", "example": "123456" },
+                  "newPassword": { "type": "string", "example": "Mật_khẩu_mới_123" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Đổi mật khẩu thành công" },
+          "400": { "description": "Mật khẩu cũ không đúng" }
+        }
+      }
+    },
+    "/api/categories": {
+      "get": {
+        "summary": "Lấy danh sách danh mục",
+        "tags": ["Categories"],
+        "responses": {
+          "200": { "description": "Thành công" }
+        }
+      },
+      "post": {
+        "summary": "Tạo danh mục mới",
+        "tags": ["Categories"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string", "example": "Ăn uống" },
+                  "type": { "type": "string", "example": "EXPENSE" },
+                  "icon": { "type": "string", "example": "🍔" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Tạo thành công" }
+        }
+      }
+    },
+    "/api/categories/{id}": {
+      "put": {
+        "summary": "Cập nhật danh mục",
+        "tags": ["Categories"],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string", "example": "Ăn uống & Cà phê" },
+                  "type": { "type": "string", "example": "EXPENSE" },
+                  "icon": { "type": "string", "example": "☕" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Cập nhật thành công" }
+        }
+      },
+      "delete": {
+        "summary": "Xóa danh mục",
+        "tags": ["Categories"],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Xóa thành công" }
+        }
+      }
+    },
+    "/api/transactions/stats": {
+      "get": {
+        "summary": "Xem thống kê tổng Thu/Chi",
+        "tags": ["Transactions"],
+        "parameters": [
+          { "name": "all", "in": "query", "schema": { "type": "string", "example": "true" }, "description": "Xem toàn thời gian" },
+          { "name": "month", "in": "query", "schema": { "type": "number", "example": 2 } },
+          { "name": "year", "in": "query", "schema": { "type": "number", "example": 2026 } }
+        ],
+        "responses": {
+          "200": { "description": "Thống kê thành công" }
+        }
+      }
+    },
+    "/api/transactions": {
+      "get": {
+        "summary": "Lấy lịch sử giao dịch",
+        "tags": ["Transactions"],
+        "responses": {
+          "200": { "description": "Thành công" }
+        }
+      },
+      "post": {
+        "summary": "Tạo giao dịch mới",
+        "tags": ["Transactions"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "categoryId": { "type": "string", "example": "uuid-cua-danh-muc" },
+                  "amount": { "type": "number", "example": 50000 },
+                  "transactionDate": { "type": "string", "example": "2026-02-27" },
+                  "notes": { "type": "string", "example": "Ăn trưa phở bò" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Tạo thành công" }
+        }
+      }
+    },
+    "/api/transactions/{id}": {
+      "put": {
+        "summary": "Sửa giao dịch",
+        "tags": ["Transactions"],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "categoryId": { "type": "string", "example": "uuid-cua-danh-muc" },
+                  "amount": { "type": "number", "example": 60000 },
+                  "transactionDate": { "type": "string", "example": "2026-02-27" },
+                  "notes": { "type": "string", "example": "Ăn trưa phở bò + trà đá" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Sửa thành công" }
+        }
+      },
+      "delete": {
+        "summary": "Xóa giao dịch",
+        "tags": ["Transactions"],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Xóa thành công" }
+        }
+      }
     }
   }
 }
